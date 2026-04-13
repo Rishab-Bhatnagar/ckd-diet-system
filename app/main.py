@@ -23,12 +23,6 @@ from app.api.recommend import router as recommend_router
 # Create FastAPI app
 app = FastAPI(title="CKD Diet Recommendation API")
 
-
-# Include routers
-app.include_router(stage_router)
-app.include_router(food_router)
-app.include_router(recommend_router)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # allow all (for now)
@@ -36,6 +30,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(stage_router)
+app.include_router(food_router)
+app.include_router(recommend_router)
+
+
 
 # Startup event
 @app.on_event("startup")
