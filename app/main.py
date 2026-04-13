@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.logger import setup_logger
 
 setup_logger()
@@ -29,6 +29,13 @@ app.include_router(stage_router)
 app.include_router(food_router)
 app.include_router(recommend_router)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all (for now)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Startup event
 @app.on_event("startup")
