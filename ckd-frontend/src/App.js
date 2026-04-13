@@ -1,25 +1,44 @@
-import { useEffect } from "react";
+import { useState } from "react";
+import { Container, Typography, Paper } from "@mui/material";
+import DietForm from "./components/DietForm";
+import DietResult from "./components/DietResult";
 import { getDiet } from "./services/api";
 
 function App() {
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getDiet(3, false, false);
-        console.log("API Response:", data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    fetchData();
-  }, []);
+  const handleSubmit = async (stage, diabetes, hypertension) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const result = await getDiet(stage, diabetes, hypertension);
+      setData(result);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>CKD Diet Recommendation System</h1>
-      <p>Check console for API response</p>
-    </div>
+    <Container maxWidth="md"sx={{ mt: 4,}}>
+
+      <Paper elevation={4} sx={{ p: 3, backgroundColor: "#112240", borderRadius: "12px",  }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: "bold", letterSpacing: "1px"}}>
+          CKD Diet Recommendation System
+        </Typography>
+
+        <DietForm onSubmit={handleSubmit} />
+
+        {loading && <Typography>⏳ Loading...</Typography>}
+        {error && <Typography color="error">{error}</Typography>}
+
+        {!loading && !error && <DietResult data={data} />}
+      </Paper>
+    </Container>
   );
 }
 
