@@ -74,16 +74,15 @@ def calculate_nutrition(foods):
     return total
 
 
-def build_meal(target_calories, foods, used_foods):
+def build_meal(target_calories, primary_foods, fallback_foods, used_foods):
     selected = []
     current_calories = 0
 
-    for food in foods:
+    all_foods = primary_foods + fallback_foods
+
+    for food in all_foods:
         if food.name in used_foods:
             continue
-
-        if current_calories >= target_calories:
-            break
 
         selected.append({
             "name": food.name,
@@ -92,6 +91,10 @@ def build_meal(target_calories, foods, used_foods):
 
         used_foods.add(food.name)
         current_calories += food.calories
+
+        # stop if reached target OR at least 2 items
+        if current_calories >= target_calories or len(selected) >= 2:
+            break
 
     return selected
 
@@ -130,7 +133,7 @@ def get_diet_recommendation(stage_number: int, diabetes=False, hypertension=Fals
 
     safe, moderate, avoid = [], [], []
     safe_food_objects = []
-
+    moderate_food_objects = []
     for food in foods:
         score, reasons = analyze_food(food, stage, diabetes, hypertension)
 
@@ -146,16 +149,25 @@ def get_diet_recommendation(stage_number: int, diabetes=False, hypertension=Fals
             safe_food_objects.append(food)
         elif score <= 3:
             moderate.append(food_info)
+            moderate_food_objects.append(food)
         else:
             avoid.append(food_info)
 
-    # Meal planning
-    used_foods = set()
+    
+   
+    # 🎯 Calorie Target
     total_calories_target = 1500
 
-    breakfast = build_meal(total_calories_target * 0.3, safe_food_objects, used_foods)
-    lunch = build_meal(total_calories_target * 0.4, safe_food_objects, used_foods)
-    dinner = build_meal(total_calories_target * 0.3, safe_food_objects, used_foods)
+    breakfast_target = total_calories_target * 0.3
+    lunch_target = total_calories_target * 0.4
+    dinner_target = total_calories_target * 0.3
+
+# Meal planning
+    used_foods = set()
+
+    breakfast = build_meal(breakfast_target, safe_food_objects, moderate_food_objects, used_foods)
+    lunch = build_meal(lunch_target, safe_food_objects, moderate_food_objects, used_foods)
+    dinner = build_meal(dinner_target, safe_food_objects, moderate_food_objects, used_foods)
 
     # Nutrition
     nutrition_summary = calculate_nutrition(safe_food_objects)

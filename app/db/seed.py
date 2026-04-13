@@ -26,6 +26,9 @@ def seed_ckd_stages():
 def seed_food_items():
     db = SessionLocal()
 
+    db.query(FoodItem).delete()
+    db.commit()
+
     foods = [
     # Breakfast items
     FoodItem(name="Roti", calories=120, protein=3, sodium=5, potassium=80, sugar=0),
@@ -49,12 +52,19 @@ def seed_food_items():
     # Avoid-heavy foods (for contrast)
     FoodItem(name="Pickle", calories=50, protein=1, sodium=1500, potassium=50, sugar=2),
     FoodItem(name="Fried Snacks", calories=300, protein=4, sodium=500, potassium=200, sugar=3),
+
+    #Typical indian foods(for more variety in dishes)
+    FoodItem(name="Chapati", calories=110, protein=3, sodium=5, potassium=70, sugar=0),
+    FoodItem(name="Rajma", calories=250, protein=9, sodium=300, potassium=400, sugar=2),
+    FoodItem(name="Chole", calories=280, protein=10, sodium=350, potassium=450, sugar=3),
+    FoodItem(name="Khichdi", calories=180, protein=6, sodium=200, potassium=250, sugar=1),
+    FoodItem(name="Oats", calories=150, protein=5, sodium=2, potassium=120, sugar=1),
+    FoodItem(name="Paratha", calories=300, protein=6, sodium=400, potassium=150, sugar=2),
+    FoodItem(name="Vegetable Soup", calories=80, protein=2, sodium=150, potassium=200, sugar=2),
+    FoodItem(name="Sprouts", calories=100, protein=7, sodium=10, potassium=200, sugar=1),
 ]
 
-    for food in foods:
-        existing = db.query(FoodItem).filter(FoodItem.name == food.name).first()
-        if not existing:
-            db.add(food)
+    db.add_all(foods)
 
     db.commit()
     db.close()
